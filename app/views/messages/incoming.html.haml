@@ -4,7 +4,7 @@
 = render 'servers/sidebar', :active_server => @server
 = render 'servers/header', :active_nav => :messages
 = render 'header', :active_nav => :incoming
-- if @messages[:records].empty? && !@queried
+- if @messages.empty? && !@queried
   .pageContent--compact
     .noData.noData--clean
       %h2.noData__title No messages have been received yet.
