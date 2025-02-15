@@ -21,10 +21,13 @@ module Postal
         end
 
         time_i = time.send("beginning_of_#{STATS_GAPS[type]}").utc.to_i
-        sql_query = "INSERT INTO `#{@database.database_name}`.`stats_#{type}` (time, #{COUNTERS.join(', ')})"
-        sql_query << " VALUES (#{time_i}, #{initial_values.join(', ')})"
-        sql_query << " ON DUPLICATE KEY UPDATE #{field} = #{field} + 1"
-        @database.query(sql_query)
+
+        get_klass(type).import(
+          COUNTERS,
+          [time_i].concat(initial_values),
+          validate: false,
+          on_duplicate_key_update: { conflict_target: [:time], set: { field => field + 1 } }
+        )
       end
 
       #
@@ -46,13 +49,23 @@ module Postal
             h[c] = 0
           end
         end
-        @database.select("stats_#{type}", where: { time: items.keys.map(&:to_i) }, fields: [:time] | counters).each do |data|
-          time = Time.zone.at(data.delete("time"))
+
+        get_klass(type).where(time: items.keys.map(&:to_i)).each do |data|
+          time = Time.zone.at(data.time)
           data.each do |key, value|
             items[time][key.to_sym] = value
           end
         end
         items.to_a.reverse
+      end
+
+      def get_klass(type)
+        {
+          hourly: Mailbox::Stats::Hourly,
+          daily: Mailbox::Stats::Daily,
+          monthly: Mailbox::Stats::Monthly,
+          yearly: Mailbox::Stats::Yearly
+        }[type]
       end
 
     end

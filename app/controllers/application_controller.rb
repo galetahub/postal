@@ -114,4 +114,8 @@ class ApplicationController < ActionController::Base
     @current_user = user
   end
 
+  def switch_tenant(&block)
+    Apartment::Tenant.switch(@server.tenant_name, &block)
+  end
+
 end

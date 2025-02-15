@@ -34,6 +34,8 @@ gem "webrick"
 # gem "mysql2"
 gem "pg"
 
+# On duplicate key update support
+gem "activerecord-import"
 # Multitenancy for ActiveRecord
 gem "ros-apartment", require: "apartment"
 

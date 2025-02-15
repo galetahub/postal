@@ -2,19 +2,19 @@
 
 # == Schema Information
 #
-# Table name: servers
+# Table name: public.servers
 #
 #  id                                 :integer          not null, primary key
 #  allow_sender                       :boolean          default(FALSE)
 #  deleted_at                         :datetime
-#  domains_not_to_click_track         :text(65535)
+#  domains_not_to_click_track         :text
 #  log_smtp_data                      :boolean          default(FALSE)
 #  message_retention_days             :integer
-#  mode                               :string(255)
-#  name                               :string(255)
+#  mode                               :string
+#  name                               :string
 #  outbound_spam_threshold            :decimal(8, 2)
-#  permalink                          :string(255)
-#  postmaster_address                 :string(255)
+#  permalink                          :string
+#  postmaster_address                 :string
 #  privacy_mode                       :boolean          default(FALSE)
 #  raw_message_retention_days         :integer
 #  raw_message_retention_size         :integer
@@ -26,9 +26,9 @@
 #  spam_failure_threshold             :decimal(8, 2)
 #  spam_threshold                     :decimal(8, 2)
 #  suspended_at                       :datetime
-#  suspension_reason                  :string(255)
-#  token                              :string(255)
-#  uuid                               :string(255)
+#  suspension_reason                  :string
+#  token                              :string
+#  uuid                               :string
 #  created_at                         :datetime
 #  updated_at                         :datetime
 #  ip_pool_id                         :integer
@@ -85,13 +85,13 @@ class Server < ApplicationRecord
 
   after_create do
     unless provision_database == false
-      message_db.provisioner.provision
+      Apartment::Tenant.create(tenant_name)
     end
   end
 
   after_commit(on: :destroy) do
     unless provision_database == false
-      message_db.provisioner.drop
+      Apartment::Tenant.drop(tenant_name)
     end
   end
 
@@ -136,7 +136,7 @@ class Server < ApplicationRecord
   end
 
   def held_messages
-    @held_messages ||= message_db.messages(where: { held: true }, count: true)
+    @held_messages ||= Mailbox::Message.where(held: true).count
   end
 
   def throughput_stats
@@ -295,6 +295,10 @@ class Server < ApplicationRecord
     end
 
     ip_pool
+  end
+
+  def tenant_name
+    @tenant_name ||= "#{Postal::Config.message_db.database_name_prefix}-server-#{id}"
   end
 
   private

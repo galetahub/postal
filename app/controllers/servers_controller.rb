@@ -7,6 +7,9 @@ class ServersController < ApplicationController
   before_action :admin_required, only: [:advanced, :suspend, :unsuspend]
   before_action { params[:id] && @server = organization.servers.present.find_by_permalink!(params[:id]) }
 
+  # Switch the server's tenant
+  around_action :switch_tenant, only: [:show, :queue]
+
   def index
     @servers = organization.servers.present.order(:name).to_a
   end
@@ -25,7 +28,8 @@ class ServersController < ApplicationController
     @first_date = graph_data.first.first
     @last_date = graph_data.last.first
     @graph_data = graph_data.map(&:last)
-    @messages = @server.message_db.messages(order: "id", direction: "desc", limit: 6)
+
+    @messages = Mailbox::Message.order(id: :desc).limit(6)
   end
 
   def new

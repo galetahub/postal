@@ -7,6 +7,8 @@ class MessagesController < ApplicationController
   before_action { @server = organization.servers.present.find_by_permalink!(params[:server_id]) }
   before_action { params[:id] && @message = @server.message_db.message(params[:id].to_i) }
 
+  around_action :switch_tenant
+
   def new
     if params[:direction] == "incoming"
       @message = IncomingMessagePrototype.new(@server, request.ip, "web-ui", {})
@@ -207,7 +209,10 @@ class MessagesController < ApplicationController
       end
     end
 
-    @messages = @server.message_db.messages_with_pagination(params[:page], options)
+    options[:order] ||= :id
+    options[:direction] ||= :desc
+
+    @messages = Mailbox::Message.order(options[:order] => options[:direction]).where(options[:where]).page(params[:page])
   end
 
   class TimeUndetermined < Postal::Error; end

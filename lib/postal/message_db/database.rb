@@ -54,10 +54,6 @@ module Postal
         Message.find(self, *args)
       end
 
-      def messages_with_pagination(*args)
-        Message.find_with_pagination(self, *args)
-      end
-
       #
       # Create a new message with the given attributes. This won't be saved to the database
       # until it has been 'save'd.
@@ -70,7 +66,7 @@ module Postal
       # Return the total size of all stored messages
       #
       def total_size
-        query("SELECT SUM(size) AS size FROM `#{database_name}`.`raw_message_sizes`").first["size"] || 0
+        Mailbox::RawMessageSize.sum(:size)
       end
 
       #
