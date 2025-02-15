@@ -10,8 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
-  create_table "additional_route_endpoints", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+ActiveRecord::Schema[7.0].define(version: 2025_02_15_142343) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
+  create_table "additional_route_endpoints", id: :serial, force: :cascade do |t|
     t.integer "route_id"
     t.string "endpoint_type"
     t.integer "endpoint_id"
@@ -19,7 +22,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.datetime "updated_at", precision: nil, null: false
   end
 
-  create_table "address_endpoints", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "address_endpoints", id: :serial, force: :cascade do |t|
     t.integer "server_id"
     t.string "uuid"
     t.string "address"
@@ -28,7 +31,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.datetime "updated_at", precision: nil, null: false
   end
 
-  create_table "authie_sessions", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "authie_sessions", id: :serial, force: :cascade do |t|
     t.string "token"
     t.string "browser_id"
     t.integer "user_id"
@@ -55,13 +58,13 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.string "login_ip_country"
     t.string "two_factored_ip_country"
     t.string "last_activity_ip_country"
-    t.index ["browser_id"], name: "index_authie_sessions_on_browser_id", length: 8
-    t.index ["token"], name: "index_authie_sessions_on_token", length: 8
-    t.index ["token_hash"], name: "index_authie_sessions_on_token_hash", length: 8
+    t.index ["browser_id"], name: "index_authie_sessions_on_browser_id"
+    t.index ["token"], name: "index_authie_sessions_on_token"
+    t.index ["token_hash"], name: "index_authie_sessions_on_token_hash"
     t.index ["user_id"], name: "index_authie_sessions_on_user_id"
   end
 
-  create_table "credentials", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "credentials", id: :serial, force: :cascade do |t|
     t.integer "server_id"
     t.string "key"
     t.string "type"
@@ -74,7 +77,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.string "uuid"
   end
 
-  create_table "domains", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "domains", id: :serial, force: :cascade do |t|
     t.integer "server_id"
     t.string "uuid"
     t.string "name"
@@ -100,10 +103,10 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.string "dkim_identifier_string"
     t.boolean "use_for_any"
     t.index ["server_id"], name: "index_domains_on_server_id"
-    t.index ["uuid"], name: "index_domains_on_uuid", length: 8
+    t.index ["uuid"], name: "index_domains_on_uuid"
   end
 
-  create_table "http_endpoints", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "http_endpoints", id: :serial, force: :cascade do |t|
     t.integer "server_id"
     t.string "uuid"
     t.string "name"
@@ -120,7 +123,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.integer "timeout"
   end
 
-  create_table "ip_addresses", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "ip_addresses", id: :serial, force: :cascade do |t|
     t.integer "ip_pool_id"
     t.string "ipv4"
     t.string "ipv6"
@@ -130,7 +133,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.integer "priority"
   end
 
-  create_table "ip_pool_rules", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "ip_pool_rules", id: :serial, force: :cascade do |t|
     t.string "uuid"
     t.string "owner_type"
     t.integer "owner_id"
@@ -141,23 +144,236 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.datetime "updated_at", precision: nil, null: false
   end
 
-  create_table "ip_pools", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "ip_pools", id: :serial, force: :cascade do |t|
     t.string "name"
     t.string "uuid"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean "default", default: false
-    t.index ["uuid"], name: "index_ip_pools_on_uuid", length: 8
+    t.index ["uuid"], name: "index_ip_pools_on_uuid"
   end
 
-  create_table "organization_ip_pools", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "mailbox_clicks", force: :cascade do |t|
+    t.integer "message_id"
+    t.integer "link_id"
+    t.string "ip_address"
+    t.string "country"
+    t.string "city"
+    t.text "user_agent"
+    t.decimal "timestamp", precision: 18, scale: 6
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["link_id"], name: "index_mailbox_clicks_on_link_id"
+    t.index ["message_id"], name: "index_mailbox_clicks_on_message_id"
+  end
+
+  create_table "mailbox_deliveries", force: :cascade do |t|
+    t.integer "message_id"
+    t.string "status", limit: 255
+    t.integer "code"
+    t.string "output", limit: 512
+    t.string "details", limit: 512
+    t.boolean "sent_with_ssl", default: false
+    t.string "log_id", limit: 100
+    t.decimal "timestamp", precision: 18, scale: 6
+    t.decimal "time", precision: 18, scale: 6
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["message_id"], name: "index_mailbox_deliveries_on_message_id"
+  end
+
+  create_table "mailbox_links", force: :cascade do |t|
+    t.integer "message_id"
+    t.string "token"
+    t.string "hash"
+    t.text "url"
+    t.decimal "timestamp", precision: 18, scale: 6
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["message_id"], name: "index_mailbox_links_on_message_id"
+    t.index ["token"], name: "index_mailbox_links_on_token"
+  end
+
+  create_table "mailbox_live_stats", force: :cascade do |t|
+    t.string "counter_type", limit: 20, null: false
+    t.integer "minute", null: false
+    t.integer "count"
+    t.decimal "timestamp", precision: 18, scale: 6
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["minute", "counter_type"], name: "index_mailbox_live_stats_on_minute_and_counter_type", unique: true
+  end
+
+  create_table "mailbox_loads", force: :cascade do |t|
+    t.integer "message_id"
+    t.string "ip_address"
+    t.string "country"
+    t.string "city"
+    t.text "user_agent"
+    t.decimal "timestamp", precision: 18, scale: 6
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["message_id"], name: "index_mailbox_loads_on_message_id"
+  end
+
+  create_table "mailbox_messages", force: :cascade do |t|
+    t.string "token"
+    t.string "scope", limit: 10
+    t.string "rcpt_to"
+    t.string "mail_from"
+    t.text "subject"
+    t.string "message_id", limit: 255
+    t.decimal "timestamp", precision: 18, scale: 6
+    t.integer "route_id"
+    t.integer "domain_id"
+    t.integer "credential_id"
+    t.string "status", limit: 255
+    t.boolean "held", default: false
+    t.string "size", limit: 255
+    t.decimal "last_delivery_attempt", precision: 18, scale: 6
+    t.string "raw_table", limit: 255
+    t.integer "raw_body_id"
+    t.integer "raw_headers_id"
+    t.boolean "inspected", default: false
+    t.boolean "spam", default: false
+    t.decimal "spam_score", precision: 8, scale: 2, default: "0.0"
+    t.boolean "threat", default: false
+    t.string "threat_details", limit: 255
+    t.boolean "bounce", default: false
+    t.integer "bounce_for_id"
+    t.string "tag", limit: 255
+    t.decimal "loaded", precision: 18, scale: 6
+    t.decimal "clicked", precision: 18, scale: 6
+    t.boolean "received_with_ssl", default: false
+    t.decimal "hold_expiry", precision: 18, scale: 6
+    t.integer "tracked_links", default: 0
+    t.integer "tracked_images", default: 0
+    t.boolean "parsed", default: false
+    t.integer "endpoint_id"
+    t.string "endpoint_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bounce_for_id"], name: "index_mailbox_messages_on_bounce_for_id"
+    t.index ["held"], name: "index_mailbox_messages_on_held"
+    t.index ["mail_from"], name: "index_mailbox_messages_on_mail_from"
+    t.index ["message_id"], name: "index_mailbox_messages_on_message_id"
+    t.index ["raw_table"], name: "index_mailbox_messages_on_raw_table"
+    t.index ["rcpt_to"], name: "index_mailbox_messages_on_rcpt_to"
+    t.index ["scope", "spam", "status", "timestamp"], name: "index_mailbox_messages_on_scope_spam_status_and_timestamp"
+    t.index ["scope", "spam", "tag", "timestamp"], name: "index_mailbox_messages_on_scope_spam_tag_and_timestamp"
+    t.index ["scope", "spam", "timestamp"], name: "index_mailbox_messages_on_scope_spam_and_timestamp"
+    t.index ["scope", "threat", "status", "timestamp"], name: "index_mailbox_messages_on_scope_threat_status_and_timestamp"
+    t.index ["scope", "threat", "timestamp"], name: "index_mailbox_messages_on_scope_threat_and_timestamp"
+    t.index ["status"], name: "index_mailbox_messages_on_status"
+    t.index ["token"], name: "index_mailbox_messages_on_token"
+  end
+
+  create_table "mailbox_raw_message_sizes", force: :cascade do |t|
+    t.string "table_name"
+    t.bigint "size"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["table_name"], name: "index_mailbox_raw_message_sizes_on_table_name"
+  end
+
+  create_table "mailbox_spam_checks", force: :cascade do |t|
+    t.integer "message_id"
+    t.decimal "score", precision: 8, scale: 2
+    t.string "code"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_mailbox_spam_checks_on_code"
+    t.index ["message_id"], name: "index_mailbox_spam_checks_on_message_id"
+  end
+
+  create_table "mailbox_stats_daily", force: :cascade do |t|
+    t.integer "time", null: false
+    t.bigint "incoming"
+    t.bigint "outgoing"
+    t.bigint "spam"
+    t.bigint "bounces"
+    t.bigint "held"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["time"], name: "index_mailbox_stats_daily_on_time", unique: true
+  end
+
+  create_table "mailbox_stats_hourly", force: :cascade do |t|
+    t.integer "time", null: false
+    t.bigint "incoming"
+    t.bigint "outgoing"
+    t.bigint "spam"
+    t.bigint "bounces"
+    t.bigint "held"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["time"], name: "index_mailbox_stats_hourly_on_time", unique: true
+  end
+
+  create_table "mailbox_stats_monthly", force: :cascade do |t|
+    t.integer "time", null: false
+    t.bigint "incoming"
+    t.bigint "outgoing"
+    t.bigint "spam"
+    t.bigint "bounces"
+    t.bigint "held"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["time"], name: "index_mailbox_stats_monthly_on_time", unique: true
+  end
+
+  create_table "mailbox_stats_yearly", force: :cascade do |t|
+    t.integer "time", null: false
+    t.bigint "incoming"
+    t.bigint "outgoing"
+    t.bigint "spam"
+    t.bigint "bounces"
+    t.bigint "held"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["time"], name: "index_mailbox_stats_yearly_on_time", unique: true
+  end
+
+  create_table "mailbox_suppressions", force: :cascade do |t|
+    t.string "suppression_type"
+    t.string "address"
+    t.string "reason"
+    t.decimal "timestamp", precision: 18, scale: 6
+    t.decimal "keep_until", precision: 18, scale: 6
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["address"], name: "index_mailbox_suppressions_on_address"
+    t.index ["keep_until"], name: "index_mailbox_suppressions_on_keep_until"
+  end
+
+  create_table "mailbox_webhook_requests", force: :cascade do |t|
+    t.string "uuid"
+    t.string "event"
+    t.text "url"
+    t.integer "attempt"
+    t.decimal "timestamp", precision: 18, scale: 6
+    t.integer "status_code"
+    t.text "body"
+    t.text "payload"
+    t.boolean "will_retry", default: false
+    t.integer "webhook_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event"], name: "index_mailbox_webhook_requests_on_event"
+    t.index ["timestamp"], name: "index_mailbox_webhook_requests_on_timestamp"
+    t.index ["uuid"], name: "index_mailbox_webhook_requests_on_uuid"
+    t.index ["webhook_id"], name: "index_mailbox_webhook_requests_on_webhook_id"
+  end
+
+  create_table "organization_ip_pools", id: :serial, force: :cascade do |t|
     t.integer "organization_id"
     t.integer "ip_pool_id"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
   end
 
-  create_table "organization_users", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "organization_users", id: :serial, force: :cascade do |t|
     t.integer "organization_id"
     t.integer "user_id"
     t.datetime "created_at"
@@ -166,7 +382,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.string "user_type"
   end
 
-  create_table "organizations", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "organizations", id: :serial, force: :cascade do |t|
     t.string "uuid"
     t.string "name"
     t.string "permalink"
@@ -178,11 +394,11 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.datetime "deleted_at"
     t.datetime "suspended_at"
     t.string "suspension_reason"
-    t.index ["permalink"], name: "index_organizations_on_permalink", length: 8
-    t.index ["uuid"], name: "index_organizations_on_uuid", length: 8
+    t.index ["permalink"], name: "index_organizations_on_permalink"
+    t.index ["uuid"], name: "index_organizations_on_uuid"
   end
 
-  create_table "queued_messages", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "queued_messages", id: :serial, force: :cascade do |t|
     t.integer "server_id"
     t.integer "message_id"
     t.string "domain"
@@ -196,12 +412,12 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.integer "route_id"
     t.boolean "manual", default: false
     t.string "batch_key"
-    t.index ["domain"], name: "index_queued_messages_on_domain", length: 8
+    t.index ["domain"], name: "index_queued_messages_on_domain"
     t.index ["message_id"], name: "index_queued_messages_on_message_id"
     t.index ["server_id"], name: "index_queued_messages_on_server_id"
   end
 
-  create_table "routes", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "routes", id: :serial, force: :cascade do |t|
     t.string "uuid"
     t.integer "server_id"
     t.integer "domain_id"
@@ -213,16 +429,16 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.datetime "updated_at"
     t.string "token"
     t.string "mode"
-    t.index ["token"], name: "index_routes_on_token", length: 6
+    t.index ["token"], name: "index_routes_on_token"
   end
 
-  create_table "scheduled_tasks", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "scheduled_tasks", force: :cascade do |t|
     t.string "name"
     t.datetime "next_run_after", precision: nil
     t.index ["name"], name: "index_scheduled_tasks_on_name", unique: true
   end
 
-  create_table "servers", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "servers", id: :serial, force: :cascade do |t|
     t.integer "organization_id"
     t.string "uuid"
     t.string "name"
@@ -252,12 +468,12 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.boolean "log_smtp_data", default: false
     t.boolean "privacy_mode", default: false
     t.index ["organization_id"], name: "index_servers_on_organization_id"
-    t.index ["permalink"], name: "index_servers_on_permalink", length: 6
-    t.index ["token"], name: "index_servers_on_token", length: 6
-    t.index ["uuid"], name: "index_servers_on_uuid", length: 8
+    t.index ["permalink"], name: "index_servers_on_permalink"
+    t.index ["token"], name: "index_servers_on_token"
+    t.index ["uuid"], name: "index_servers_on_uuid"
   end
 
-  create_table "smtp_endpoints", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "smtp_endpoints", id: :serial, force: :cascade do |t|
     t.integer "server_id"
     t.string "uuid"
     t.string "name"
@@ -271,13 +487,13 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.datetime "updated_at"
   end
 
-  create_table "statistics", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "statistics", id: :serial, force: :cascade do |t|
     t.bigint "total_messages", default: 0
     t.bigint "total_outgoing", default: 0
     t.bigint "total_incoming", default: 0
   end
 
-  create_table "track_certificates", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "track_certificates", id: :serial, force: :cascade do |t|
     t.string "domain"
     t.text "certificate"
     t.text "intermediaries"
@@ -288,10 +504,10 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.string "verification_string"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.index ["domain"], name: "index_track_certificates_on_domain", length: 8
+    t.index ["domain"], name: "index_track_certificates_on_domain"
   end
 
-  create_table "track_domains", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "track_domains", id: :serial, force: :cascade do |t|
     t.string "uuid"
     t.integer "server_id"
     t.integer "domain_id"
@@ -307,16 +523,16 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.text "excluded_click_domains"
   end
 
-  create_table "user_invites", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "user_invites", id: :serial, force: :cascade do |t|
     t.string "uuid"
     t.string "email_address"
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.index ["uuid"], name: "index_user_invites_on_uuid", length: 12
+    t.index ["uuid"], name: "index_user_invites_on_uuid"
   end
 
-  create_table "users", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "users", id: :serial, force: :cascade do |t|
     t.string "uuid"
     t.string "first_name"
     t.string "last_name"
@@ -332,18 +548,18 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.boolean "admin", default: false
     t.string "oidc_uid"
     t.string "oidc_issuer"
-    t.index ["email_address"], name: "index_users_on_email_address", length: 8
-    t.index ["uuid"], name: "index_users_on_uuid", length: 8
+    t.index ["email_address"], name: "index_users_on_email_address"
+    t.index ["uuid"], name: "index_users_on_uuid"
   end
 
-  create_table "webhook_events", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "webhook_events", id: :serial, force: :cascade do |t|
     t.integer "webhook_id"
     t.string "event"
     t.datetime "created_at"
     t.index ["webhook_id"], name: "index_webhook_events_on_webhook_id"
   end
 
-  create_table "webhook_requests", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "webhook_requests", id: :serial, force: :cascade do |t|
     t.integer "server_id"
     t.integer "webhook_id"
     t.string "url"
@@ -359,7 +575,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.index ["locked_by"], name: "index_webhook_requests_on_locked_by"
   end
 
-  create_table "webhooks", id: :integer, charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "webhooks", id: :serial, force: :cascade do |t|
     t.integer "server_id"
     t.string "uuid"
     t.string "name"
@@ -373,7 +589,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_03_11_205229) do
     t.index ["server_id"], name: "index_webhooks_on_server_id"
   end
 
-  create_table "worker_roles", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+  create_table "worker_roles", force: :cascade do |t|
     t.string "role"
     t.string "worker"
     t.datetime "acquired_at", precision: nil
